@@ -49,6 +49,16 @@ OLLAMA_MODEL=nomic-embed-text
 DB_PATH=rag.db
 ```
 
+## Dev Container Configuration
+
+The project includes a `.devcontainer` configuration designed to access the Ollama service running on the host machine.
+
+*   **Host Mapping**: The container maps the hostname `ollama-host` to the specific IP `192.168.0.232`.
+*   **Environment Variable**: `OLLAMA_BASE_URL` is automatically set to `http://ollama-host:11434`.
+
+> [!IMPORTANT]
+> This configuration relies on the host IP being `192.168.0.232`. If your host IP is different, you must update the `--add-host` value in `.devcontainer/devcontainer.json` and **Rebuild the Container**.
+
 ## Running the Application
 
 1.  **Install Dependencies**:

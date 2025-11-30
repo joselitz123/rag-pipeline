@@ -1,0 +1,17 @@
+Project Overview (RAG Pipeline)
+
+- **Purpose**: Implements a Retrieval‑Augmented Generation (RAG) pipeline exposing a FastAPI service.
+- **Core Components**:
+  - **Docling** – parses uploaded documents (PDF/DOCX) into text chunks.
+  - **Ollama** – provides embedding model (`nomic-embed-text`) for both document chunks and query vectors.
+  - **SQLite‑Vec** – local vector store for embeddings, enabling fast similarity search.
+  - **Azure AI Foundry** – LLM (e.g., GPT‑4) used to generate answers from retrieved context.
+- **Key Endpoints**:
+  - `POST /ingest` – accepts a file, runs `ingest_file` (Docling → chunk → embed → store).
+  - `POST /chat` – receives a query, embeds it, searches SQLite‑Vec, assembles context, calls Azure LLM, returns answer.
+- **Configuration** (`config.py`): loads environment variables for Azure endpoint, deployment, API key, Ollama URL/model, and DB path.
+- **Database** (`database.py`): initializes SQLite DB on startup.
+- **Running**: `pip install -r requirements.txt`, then `python main.py` (or `uvicorn main:app --reload`).
+- **Tests**: `test_rag.py` validates ingestion and chat flow.
+
+The project is a self‑contained RAG service that can be extended with additional document types or LLM providers.
