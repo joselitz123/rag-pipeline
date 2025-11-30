@@ -1,55 +1,86 @@
 import os
+import time
 from fastapi.testclient import TestClient
-from unittest.mock import patch, MagicMock
 from main import app
+from config import config
+from database import init_db
+
+# Use a test database to avoid affecting the real one
+TEST_DB = "test_rag.db"
+config.DB_PATH = TEST_DB
+
+# Initialize the test database
+if os.path.exists(TEST_DB):
+    os.remove(TEST_DB)
+init_db()
+
+print(f"Using OLLAMA_BASE_URL: {config.OLLAMA_BASE_URL}")
+
+# Check Ollama connectivity
+try:
+    from ollama import Client
+    ollama_client = Client(host=config.OLLAMA_BASE_URL)
+    ollama_client.list()
+    print("Ollama connection successful.")
+except Exception as e:
+    print(f"WARNING: Could not connect to Ollama at {config.OLLAMA_BASE_URL}: {e}")
+    print("Tests involving embeddings might fail or hang.")
 
 client = TestClient(app)
 
 def test_ingest():
-    print("Testing Ingestion...")
+    print("Testing Ingestion (Real)...")
     # Create a dummy file
-    with open("test_doc.md", "w") as f:
-        f.write("This is a test document content for ingestion.")
+    test_filename = "test_doc.md"
+    with open(test_filename, "w") as f:
+        f.write("This is a test document content for ingestion. It contains information about testing RAG pipelines.")
     
-    # Mock embedding generation
-    with patch("ingestion.get_embedding") as mock_embedding:
-        # Return a dummy embedding of length 4096 (matching database schema)
-        mock_embedding.return_value = [0.1] * 4096
-        
-        with open("test_doc.md", "rb") as f:
-            files = {'file': ('test_doc.md', f, 'text/markdown')}
+    try:
+        with open(test_filename, "rb") as f:
+            files = {'file': (test_filename, f, 'text/markdown')}
             response = client.post("/ingest", files=files)
             
-    print(f"Status: {response.status_code}")
-    print(f"Response: {response.json()}")
-    
-    assert response.status_code == 200
-    assert response.json()["status"] == "success"
-    
-    os.remove("test_doc.md")
+        print(f"Status: {response.status_code}")
+        print(f"Response: {response.json()}")
+        
+        assert response.status_code == 200
+        assert response.json()["status"] == "success"
+        assert response.json()["chunks_processed"] > 0
+        
+    finally:
+        if os.path.exists(test_filename):
+            os.remove(test_filename)
 
 def test_chat():
-    print("\nTesting Chat...")
-    payload = {"query": "What is this document about?"}
+    print("\nTesting Chat (Real)...")
+    # Give some time for any async processing if needed (though sqlite is sync here)
+    time.sleep(1)
     
-    # Mock embedding for the query
-    with patch("rag.retrieve_context") as mock_retrieve:
-        mock_retrieve.return_value = ["This is a test document content."]
-        
-        # Mock Azure OpenAI client
-        with patch("rag.client.chat.completions.create") as mock_create:
-            mock_response = MagicMock()
-            mock_response.choices[0].message.content = "This document is about testing."
-            mock_create.return_value = mock_response
-            
-            response = client.post("/chat", json=payload)
+    payload = {"query": "What does the document contain information about?"}
+    
+    response = client.post("/chat", json=payload)
             
     print(f"Status: {response.status_code}")
     print(f"Response: {response.json()}")
     
     assert response.status_code == 200
-    assert response.json()["answer"] == "This document is about testing."
+    answer = response.json().get("answer")
+    assert answer is not None
+    assert isinstance(answer, str)
+    assert len(answer) > 0
+    # Check if the answer is relevant (optional, but good sanity check)
+    # The document mentions "testing RAG pipelines", so the answer should likely contain "testing" or "RAG".
+    print(f"Answer received: {answer}")
 
 if __name__ == "__main__":
-    test_ingest()
-    test_chat()
+    try:
+        test_ingest()
+        test_chat()
+        print("\nAll tests passed successfully!")
+    except Exception as e:
+        print(f"\nTests failed: {e}")
+        exit(1)
+    finally:
+        # Cleanup test database
+        if os.path.exists(TEST_DB):
+            os.remove(TEST_DB)

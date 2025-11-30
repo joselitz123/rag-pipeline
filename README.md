@@ -53,11 +53,13 @@ DB_PATH=rag.db
 
 The project includes a `.devcontainer` configuration designed to access the Ollama service running on the host machine.
 
-*   **Host Mapping**: The container maps the hostname `ollama-host` to the specific IP `192.168.0.232`.
-*   **Environment Variable**: `OLLAMA_BASE_URL` is automatically set to `http://ollama-host:11434`.
+*   **Network Mode**: The container uses `--network=host` to share the host's network stack, providing direct access to services running on `localhost`.
+*   **Environment Variable**: `OLLAMA_BASE_URL` is automatically set to `http://localhost:11434`.
+*   **Python Version**: Uses Python 3.14.0 base image.
+*   **Auto-setup**: Dependencies are automatically installed via `postCreateCommand` after container creation.
 
-> [!IMPORTANT]
-> This configuration relies on the host IP being `192.168.0.232`. If your host IP is different, you must update the `--add-host` value in `.devcontainer/devcontainer.json` and **Rebuild the Container**.
+> [!NOTE]
+> The host networking mode allows the container to access Ollama running on the host machine without requiring specific IP address configuration. This makes the setup more portable across different environments.
 
 ## Running the Application
 
