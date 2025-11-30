@@ -18,7 +18,8 @@
                 "ms-python.python",
                 "ms-python.vscode-pylance",
                 "ms-python.black-formatter",
-                "ms-toolsai.jupyter"
+                "ms-toolsai.jupyter",
+                "google.gemini-cli-vscode-ide-companion"
             ]
         }
     },
@@ -29,13 +30,17 @@
             "installZsh": true,
             "installOhMyZsh": true,
             "upgradePackages": true
+        },
+        // Add Node.js feature as Gemini CLI requires it
+        "ghcr.io/devcontainers/features/node:1": {
+            "version": "20"
         }
     },
     // Use 'forwardPorts' to make a list of ports inside the container available locally
     "forwardPorts": [],
     // Use 'postCreateCommand' to run commands after the container is created
-    // Use 'postCreateCommand' to run commands after the container is created
-    "postCreateCommand": "pip install --upgrade pip && pip install -r requirements.txt",
+    // The command below installs python deps and the gemini cli globally using npm
+    "postCreateCommand": "pip install --upgrade pip && pip install -r requirements.txt && npm install -g @google/gemini-cli",
     // Add host mapping for Ollama
     "runArgs": [
         "--network=host"
@@ -46,6 +51,7 @@
     "containerEnv": {
         "PYTHONUNBUFFERED": "1",
         "OLLAMA_BASE_URL": "http://localhost:11434"
+        // GEMINI_API_KEY is omitted as requested, intended to be set manually in the terminal session
     },
     // Mount the workspace
     "workspaceFolder": "/workspace",

@@ -3,6 +3,14 @@
         "microsoft-learn": {
             "url": "https://learn.microsoft.com/api/mcp",
             "type": "http"
+        },
+        "context7": {
+            "type": "http",
+            "url": "https://mcp.context7.com/mcp",
+            "headers": {
+                "CONTEXT7_API_KEY": "$CONTEXT7_KEY",
+                "Accept": "text/event-stream"
+            }
         }
     },
     "inputs": []
