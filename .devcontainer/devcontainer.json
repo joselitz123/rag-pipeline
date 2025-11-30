@@ -1,0 +1,55 @@
+{
+    "name": "RAG Pipeline Development",
+    "image": "python:3.14.0",
+    // Configure tool-specific properties
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "python.defaultInterpreterPath": "/usr/local/bin/python",
+                "python.linting.enabled": true,
+                "python.linting.pylintEnabled": true,
+                "python.formatting.provider": "black",
+                "editor.formatOnSave": true,
+                "editor.codeActionsOnSave": {
+                    "source.organizeImports": "explicit"
+                }
+            },
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "ms-python.black-formatter",
+                "ms-toolsai.jupyter"
+            ]
+        }
+    },
+    // Features to add to the dev container
+    "features": {
+        "ghcr.io/devcontainers/features/git:1": {},
+        "ghcr.io/devcontainers/features/common-utils:2": {
+            "installZsh": true,
+            "installOhMyZsh": true,
+            "upgradePackages": true
+        }
+    },
+    // Use 'forwardPorts' to make a list of ports inside the container available locally
+    "forwardPorts": [],
+    // Use 'postCreateCommand' to run commands after the container is created
+    "postCreateCommand": "pip install --upgrade pip && pip install -r requirements.txt",
+    // Configure container user
+    "remoteUser": "root",
+    // Set environment variables
+    "containerEnv": {
+        "PYTHONUNBUFFERED": "1"
+    },
+    // Mount the workspace
+    "workspaceFolder": "/workspace",
+    "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+    // Run arguments for the container
+    "runArgs": [
+        "--name=rag-pipeline-dev"
+    ],
+    // Lifecycle scripts
+    "onCreateCommand": "echo 'Container created successfully!'",
+    // Keep container running
+    "overrideCommand": false
+}
