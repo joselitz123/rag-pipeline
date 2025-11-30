@@ -50,6 +50,7 @@
     ],
     // Lifecycle scripts
     "onCreateCommand": "echo 'Container created successfully!'",
-    // Keep container running
-    "overrideCommand": false
+    // Keep container running - override the default command to prevent exit
+    "overrideCommand": true,
+    "postStartCommand": "sleep infinity"
 }
