@@ -23,6 +23,13 @@ RUN cd /tmp/build-features/1 \
 && chmod +x ./devcontainer-features-install.sh \
 && ./devcontainer-features-install.sh
 
+ENV NVM_DIR=/usr/local/share/nvm
+ENV NVM_SYMLINK_CURRENT=true
+ENV PATH=/usr/local/share/nvm/current/bin:${PATH}
+RUN cd /tmp/build-features/2 \
+&& chmod +x ./devcontainer-features-install.sh \
+&& ./devcontainer-features-install.sh
+
 
 
 ARG _DEV_CONTAINERS_IMAGE_USER=root

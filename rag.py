@@ -2,6 +2,7 @@ from openai import AzureOpenAI
 from config import config
 from database import get_db_connection
 import struct
+from embeddings import client as ollama_client
 
 # Initialize Azure AI Foundry client
 client = AzureOpenAI(
@@ -14,9 +15,8 @@ def retrieve_context(query: str, limit: int = 5) -> list[str]:
     """
     Retrieve relevant context from SQLite using vector search.
     """
-    from embeddings import client
     # Generate query embedding
-    response = client.embeddings(model=config.OLLAMA_MODEL, prompt=query)
+    response = ollama_client.embeddings(model=config.OLLAMA_MODEL, prompt=query)
     query_embedding = response["embedding"]
     
     # Serialize embedding
