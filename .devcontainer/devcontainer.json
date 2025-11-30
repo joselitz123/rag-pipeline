@@ -44,13 +44,6 @@
     // Mount the workspace
     "workspaceFolder": "/workspace",
     "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
-    // Run arguments for the container
-    "runArgs": [
-        "--name=rag-pipeline-dev"
-    ],
     // Lifecycle scripts
-    "onCreateCommand": "echo 'Container created successfully!'",
-    // Keep container running - override the default command to prevent exit
-    "overrideCommand": true,
-    "postStartCommand": "sleep infinity"
+    "onCreateCommand": "echo 'Container created successfully!'"
 }
